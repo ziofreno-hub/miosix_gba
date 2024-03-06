@@ -55,6 +55,7 @@
 #OPT_BOARD := stm32l4r9zi_sensortile
 #OPT_BOARD := stm32f767zi_nucleo
 #OPT_BOARD := stm32f769ni_discovery
+OPT_BOARD := gba
 
 ##
 ## Optimization flags, choose one.
@@ -650,6 +651,14 @@ ifeq ($(OPT_BOARD),stm32l4r9zi_sensortile)
 
 endif
 
+##---------------------------------------------------------------------------
+## gba
+##
+
+# No options
+
+##---------------------------------------------------------------------------
+
 ############################################################################
 ## From the options selected above, now fill all the variables needed to  ##
 ## build Miosix. You should modify something here only if you are adding  ##
@@ -753,6 +762,8 @@ else ifeq ($(OPT_BOARD),stm32f767zi_nucleo)
     ARCH := cortexM7_stm32f7
 else ifeq ($(OPT_BOARD),stm32f769ni_discovery)
     ARCH := cortexM7_stm32f7
+else ifeq ($(OPT_BOARD),gba)
+    ARCH := arm7_lpc2000
 else
     $(info Error: no board specified in miosix/config/Makefile.inc)
     $(error Error)
@@ -794,6 +805,28 @@ ifeq ($(ARCH),arm7_lpc2000)
         BOOT_FILE := $(BOARD_INC)/core/stage_1_boot.o
         LINKER_SCRIPT := arch/arm7_lpc2000/lpc2138_miosix_board/miosix.ld
 
+        ## Select architecture specific files
+        ## These are the files in arch/<arch name>/<board name>
+        ARCH_SRC :=                                  \
+        $(BOARD_INC)/interfaces-impl/portability.cpp \
+        $(BOARD_INC)/interfaces-impl/os_timer.cpp    \
+        arch/common/drivers/sd_lpc2000.cpp           \
+        $(BOARD_INC)/interfaces-impl/delays.cpp      \
+        $(BOARD_INC)/interfaces-impl/bsp.cpp
+
+        ## Add a #define to allow querying board name
+        CFLAGS_BASE   += -D_BOARD_MIOSIX_BOARD
+        CXXFLAGS_BASE += -D_BOARD_MIOSIX_BOARD
+    else ifeq ($(OPT_BOARD),gba)
+        ## Base directory with header files for this board
+        BOARD_INC := arch/arm7_lpc2000/gba
+
+        ## Select linker script and boot file
+        ## Their path must be relative to the miosix directory.
+        BOOT_FILE := $(BOARD_INC)/core/stage_1_boot.o
+        LINKER_SCRIPT := arch/arm7_lpc2000/gba/linker/miosix.ld
+
+        ##TODO modify, files still not exists
         ## Select architecture specific files
         ## These are the files in arch/<arch name>/<board name>
         ARCH_SRC :=                                  \
