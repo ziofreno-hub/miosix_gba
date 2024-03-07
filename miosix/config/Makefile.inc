@@ -817,6 +817,10 @@ ifeq ($(ARCH),arm7_lpc2000)
         ## Add a #define to allow querying board name
         CFLAGS_BASE   += -D_BOARD_MIOSIX_BOARD
         CXXFLAGS_BASE += -D_BOARD_MIOSIX_BOARD
+    
+    ##-------------------------------------------------------------------------
+    ## BOARD: gba
+    ##
     else ifeq ($(OPT_BOARD),gba)
         ## Base directory with header files for this board
         BOARD_INC := arch/arm7_lpc2000/gba
@@ -824,18 +828,13 @@ ifeq ($(ARCH),arm7_lpc2000)
         ## Select linker script and boot file
         ## Their path must be relative to the miosix directory.
         BOOT_FILE := $(BOARD_INC)/core/stage_1_boot.o
-        LINKER_SCRIPT := arch/arm7_lpc2000/gba/linker/miosix.ld
+        LINKER_SCRIPT := arch/arm7_lpc2000/gba/miosix.ld
 
         ##TODO modify, files still not exists
         ## Select architecture specific files
         ## These are the files in arch/<arch name>/<board name>
-        ARCH_SRC :=                                  \
-        $(BOARD_INC)/interfaces-impl/portability.cpp \
-        $(BOARD_INC)/interfaces-impl/os_timer.cpp    \
-        arch/common/drivers/sd_lpc2000.cpp           \
-        $(BOARD_INC)/interfaces-impl/delays.cpp      \
-        $(BOARD_INC)/interfaces-impl/bsp.cpp
-
+        ARCH_SRC := 
+        
         ## Add a #define to allow querying board name
         CFLAGS_BASE   += -D_BOARD_MIOSIX_BOARD
         CXXFLAGS_BASE += -D_BOARD_MIOSIX_BOARD
@@ -871,7 +870,7 @@ ifeq ($(ARCH),arm7_lpc2000)
     ## These are the files in arch/<arch name>/common
     ARCH_SRC +=                                  \
     arch/common/core/interrupts_arm7.cpp         \
-    arch/common/drivers/serial_lpc2000.cpp
+    ##arch/common/drivers/serial_lpc2000.cpp
 
     ## Select programmer command line
     ## This is the program that is invoked when the user types 'make program'
