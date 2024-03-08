@@ -14,8 +14,6 @@ struct serial_1 {
     volatile uint16_t SIOCNT;
     volatile uint16_t SIOMLT_SEND;
     volatile uint16_t SIODATA8;
-
-    volatile uint16_t;
 };
 
 

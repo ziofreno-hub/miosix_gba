@@ -23,8 +23,6 @@ struct dma_channels {
     volatile uint32_t DMA3DAD;
     volatile uint16_t DMA3CNT_L;
     volatile uint16_t DMA3CNT_H;
-
-    volatile uint16_t;
 };
 
 #endif

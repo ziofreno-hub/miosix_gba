@@ -25,21 +25,10 @@
  *   along with this program; if not, see <http://www.gnu.org/licenses/>   *
  ***************************************************************************/
 
-/*
- * Versions:
- * 1.0 First release
- * 1.1 Made Mode, Gpio and GpioBase constructor private to explicitly disallow
- *     creating instances of these classes.
- * 1.2 Fixed a bug
- * 1.3 Applied patch by Lee Richmond (http://pastebin.com/f7ae1a65f). Now
- *     mode() is inlined too.
- * 1.4 Backported this abstraction library on NXP LPC2138 microcontrollers
- */
-
 #ifndef GPIO_IMPL_H
 #define	GPIO_IMPL_H
 
-//#include "LPC213x.h"
+#include "hardware_mappings/hwmapping.h"
 
 namespace miosix {
 
@@ -64,21 +53,6 @@ private:
 };
 
 /**
- * \internal
- * Memory layout of the GPIOs in the LPC2138
- */
-struct GpioMemoryLayout
-{
-    volatile unsigned int IOPIN;
-    volatile unsigned int IOSET;
-    volatile unsigned int IODIR;
-    volatile unsigned int IOCLR;
-};
-
-const unsigned int GPIO0_BASE=0xe0028000;///<\internal Base address of GPIO0 registers
-const unsigned int GPIO1_BASE=0xe0028010;///<\internal Base address of GPIO1 registers
-
-/**
  * This class allows to easiliy pass a Gpio as a parameter to a function.
  * Accessing a GPIO through this class is slower than with just the Gpio,
  * but is a convenient alternative in some cases. Also, an instance of this
@@ -89,11 +63,11 @@ class GpioPin
 public:
     /**
      * Constructor
-     * \param p GPIO0_BASE or GPIO1_BASE. Select which port
-     * \param n which pin (0 to 15)
+     * \param p Only GPIO_BASE
+     * \param n which pin (0 to 3)
      */
     GpioPin(unsigned int p, unsigned char n)
-        : p(reinterpret_cast<GpioMemoryLayout*>(p)), n(n) {}
+        : p(reinterpret_cast<gpio_registers*>(p)), n(n) {}
         
     /**
      * Set the GPIO to the desired mode (INPUT, OUTPUT)
@@ -103,9 +77,9 @@ public:
     {
         if(m==Mode::INPUT)
         {
-            p->IODIR &= ~(1<<n);
+            p->DIR &= ~(1<<n);
         } else {
-            p->IODIR |= (1<<n);
+            p->DIR |= (1<<n);
         }
     }
 
@@ -114,7 +88,7 @@ public:
      */
     void high()
     {
-        p->IOSET= 1<<n;
+        p->DATA |= 1<<n;
     }
 
     /**
@@ -122,7 +96,7 @@ public:
      */
     void low()
     {
-        p->IOCLR= 1<<n;
+        p->DATA &= ~(1<<n);
     }
 
     /**
@@ -131,7 +105,7 @@ public:
      */
     int value()
     {
-        return (p->IOPIN & 1<<n) ? 1 : 0;
+        return (p->DATA & 1<<n) ? 1 : 0;
     }
     
     /**
@@ -140,19 +114,21 @@ public:
     unsigned int getPort() const { return reinterpret_cast<unsigned int>(p); }
     
     /**
-     * \return the pin number, from 0 to 31
+     * \return the pin number, from 0 to 3
      */
     unsigned char getNumber() const { return n; }
 
 private:
-    GpioMemoryLayout *p; //Pointer to the port
+    gpio_registers *p; //Pointer to the port
     unsigned char n;     //Number of the GPIO within the port
 };
 
+
+
 /**
  * Gpio template class
- * \param P GPIO0_BASE or GPIO1_BASE. Select which port
- * \param N which pin (0 to 31)
+ * \param P GPIO_BASE, only one port available
+ * \param N which pin (0 to 3)
  * The intended use is to make a typedef to this class with a meaningful name.
  * \code
  * typedef Gpio<GPIO0_BASE,0> green_led;
@@ -170,28 +146,32 @@ public:
      */
     static void mode(Mode::Mode_ m)
     {
+        // Sets DIR and DATA registers as read/writable
+        reinterpret_cast<gpio_registers *>(P)->CTRL |= 1;
+
         if(m==Mode::INPUT)
         {
-            reinterpret_cast<GpioMemoryLayout*>(P)->IODIR &= ~(1<<N);
+            reinterpret_cast<gpio_registers *>(P)->DIR &= ~(1<<N);
+            //GPIO_BASE->IODIR &= ~(1<<N);
         } else {
-            reinterpret_cast<GpioMemoryLayout*>(P)->IODIR |= (1<<N);
+            reinterpret_cast<gpio_registers*>(P)->DIR |= 1<<N;
         }
     }
 
     /**
-     * Set the pin to 1, if it is an output
+     * Set the pin to 1
      */
     static void high()
     {
-        reinterpret_cast<GpioMemoryLayout*>(P)->IOSET= 1<<N;
+        reinterpret_cast<gpio_registers*>(P)->DATA |= 1<<N;
     }
 
     /**
-     * Set the pin to 0, if it is an output
+     * Set the pin to 0
      */
     static void low()
     {
-        reinterpret_cast<GpioMemoryLayout*>(P)->IOCLR= 1<<N;
+        reinterpret_cast<gpio_registers*>(P)->DATA &= ~(1<<N);
     }
 
     /**
@@ -200,9 +180,9 @@ public:
      */
     static int value()
     {
-        return ((reinterpret_cast<GpioMemoryLayout*>(P)->IOPIN & 1<<N)? 1 : 0);
+        return ((reinterpret_cast<gpio_registers*>(P)->DATA & 1<<N)? 1 : 0);
     }
-    
+
     /**
      * \return this Gpio converted as a GpioPin class 
      */
@@ -212,12 +192,12 @@ public:
     }
     
     /**
-     * \return the pin port. One of the constants PORT0_BASE, PORT1_BASE, ...
+     * \return the pin port. Only 1 port
      */
     unsigned int getPort() const { return P; }
     
     /**
-     * \return the pin number, from 0 to 31
+     * \return the pin number, from 0 to 3
      */
     unsigned char getNumber() const { return N; }
 

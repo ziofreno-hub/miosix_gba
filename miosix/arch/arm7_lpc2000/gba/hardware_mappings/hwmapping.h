@@ -19,6 +19,7 @@
 #define KEYPAD_INPUT ((struct keypad_input *) 0x4000130)
 #define SERIAL_2 ((struct serial_2 *) 0x4000134)
 #define INTERRUPT_REGISTERS ((struct interrupt_registers *) 0x4000200)
-#define GPIO_REGISTERS ((struct gpio_registers *) 0x80000C4)
+
+#define GPIO_BASE 0x80000C4)
 
 #endif

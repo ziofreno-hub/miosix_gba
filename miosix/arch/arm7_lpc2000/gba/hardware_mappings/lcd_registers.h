@@ -48,12 +48,11 @@ struct lcd_registers {
 
     volatile uint16_t MOSAIC;
 
-    volatile uint16_t;
+    volatile uint16_t UNUSED;
 
     volatile uint16_t BLDCNT;
     volatile uint16_t BLDALPHA;
     volatile uint16_t BLDY;
-    volatile uint16_t UNUSED_2;
 };
 
 #endif
