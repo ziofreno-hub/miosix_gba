@@ -1,4 +1,3 @@
-
 /***************************************************************************
  *   Copyright (C) 2008, 2009, 2010 by Terraneo Federico                   *
  *                                                                         *
@@ -33,5 +32,7 @@
 
 #ifndef BSP_IMPL_H
 #define BSP_IMPL_H
+
+#include "config/miosix_settings.h"
 
 #endif //BSP_IMPL_H
