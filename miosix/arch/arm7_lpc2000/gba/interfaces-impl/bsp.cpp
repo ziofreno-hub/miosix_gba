@@ -1,5 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2008, 2009, 2010 by Terraneo Federico                   *
+ *   Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014                *
+ *   by Terraneo Federico                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -26,14 +27,55 @@
  ***************************************************************************/ 
 
 /***********************************************************************
-* bsp_impl.h Part of the Miosix Embedded OS.
+* bsp.cpp Part of the Miosix Embedded OS.
 * Board support package, this file initializes hardware.
 ************************************************************************/
 
-#ifndef BSP_IMPL_H
-#define BSP_IMPL_H
-
+#include <cstdlib>
+#include <inttypes.h>
+#include <sys/ioctl.h>
+#include "interfaces/bsp.h"
+#include "core/interrupts.h"
+#include "interfaces/delays.h"
+#include "drivers/serial.h"
+#include "drivers/sd_lpc2000.h"
+#include "kernel/kernel.h"
+#include "kernel/sync.h"
+#include "interfaces/portability.h"
 #include "config/miosix_settings.h"
-#include "hardware_mappings/hwmapping.h"
+#include "kernel/logging.h"
+#include "filesystem/file_access.h"
+#include "filesystem/console/console_device.h"
 
-#endif //BSP_IMPL_H
+namespace miosix {
+
+    
+//
+// Initialization
+//
+
+void IRQbspInit() {
+}
+
+void bspInit2() {
+}
+
+//
+// Shutdown and reboot
+//
+
+/**
+This function disables filesystem (if enabled), serial port (if enabled) and
+puts the processor in deep sleep mode.<br>
+Wakeup occurs when p0.14 goes low, but instead of sleep(), a new boot happens.
+<br>This function does not return.<br>
+WARNING: close all files before using this function, since it unmounts the
+filesystem.<br>
+*/
+void shutdown() {
+}
+
+void reboot() {
+}
+
+} //namespace miosix

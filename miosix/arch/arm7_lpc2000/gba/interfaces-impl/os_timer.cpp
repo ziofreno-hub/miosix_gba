@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008, 2009, 2010 by Terraneo Federico                   *
+ *   Copyright (C) 2021 by Terraneo Federico                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -23,17 +23,49 @@
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, see <http://www.gnu.org/licenses/>   *
- ***************************************************************************/ 
+ ***************************************************************************/
 
-/***********************************************************************
-* bsp_impl.h Part of the Miosix Embedded OS.
-* Board support package, this file initializes hardware.
-************************************************************************/
+#include "kernel/kernel.h"
+#include "interfaces/os_timer.h"
+#include "interfaces/arch_registers.h"
 
-#ifndef BSP_IMPL_H
-#define BSP_IMPL_H
+namespace miosix {
 
-#include "config/miosix_settings.h"
-#include "hardware_mappings/hwmapping.h"
+void TIM0_Routine() __attribute__ ((interrupt("IRQ"),naked));
 
-#endif //BSP_IMPL_H
+class GBATimer0 : public TimerAdapter<GBATimer0, 32>
+{
+public:
+    static inline unsigned int IRQgetTimerCounter() {  return 0;}
+    static inline void IRQsetTimerCounter(unsigned int v) { }
+
+    static inline unsigned int IRQgetTimerMatchReg() {return 0; }
+    static inline void IRQsetTimerMatchReg(unsigned int v) {}
+
+    static inline bool IRQgetOverflowFlag() {return 0;}
+    static inline void IRQclearOverflowFlag() {}
+    
+    static inline bool IRQgetMatchFlag() { return 0; }
+    static inline void IRQclearMatchFlag() { }
+    
+    static inline void IRQforcePendingIrq() { }
+
+    static inline void IRQstopTimer() { }
+    static inline void IRQstartTimer() { }
+    
+    static unsigned int IRQTimerFrequency() { return 0;}
+    
+    static void IRQinitTimer() {
+    }
+};
+
+static GBATimer0 timer;
+DEFAULT_OS_TIMER_INTERFACE_IMPLMENTATION(timer);
+
+void TIM0_Routine() {
+}
+
+void __attribute__((noinline)) osTimerImpl() {
+}
+
+} //namespace miosix
