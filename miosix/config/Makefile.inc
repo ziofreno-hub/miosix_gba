@@ -763,7 +763,7 @@ else ifeq ($(OPT_BOARD),stm32f767zi_nucleo)
 else ifeq ($(OPT_BOARD),stm32f769ni_discovery)
     ARCH := cortexM7_stm32f7
 else ifeq ($(OPT_BOARD),gba)
-    ARCH := arm7_lpc2000
+    ARCH := arm7_gba
 else
     $(info Error: no board specified in miosix/config/Makefile.inc)
     $(error Error)
@@ -819,30 +819,6 @@ ifeq ($(ARCH),arm7_lpc2000)
         CXXFLAGS_BASE += -D_BOARD_MIOSIX_BOARD
     
     ##-------------------------------------------------------------------------
-    ## BOARD: gba
-    ##
-    else ifeq ($(OPT_BOARD),gba)
-        ## Base directory with header files for this board
-        BOARD_INC := arch/arm7_lpc2000/gba
-
-        ## Select linker script and boot file
-        ## Their path must be relative to the miosix directory.
-        BOOT_FILE := $(BOARD_INC)/core/stage_1_boot.o
-        LINKER_SCRIPT := arch/arm7_lpc2000/gba/miosix.ld
-
-        ##TODO modify, files still not exists
-        ## Select architecture specific files
-        ## These are the files in arch/<arch name>/<board name>
-        ARCH_SRC :=                                  \
-        $(BOARD_INC)/interfaces-impl/portability.cpp \
-        $(BOARD_INC)/interfaces-impl/os_timer.cpp    \
-        $(BOARD_INC)/interfaces-impl/bsp.cpp
-        
-        ## Add a #define to allow querying board name
-        CFLAGS_BASE   += -D_BOARD_MIOSIX_BOARD
-        CXXFLAGS_BASE += -D_BOARD_MIOSIX_BOARD
-        
-    ##-------------------------------------------------------------------------
     ## End of board list
     ##
     endif
@@ -874,6 +850,72 @@ ifeq ($(ARCH),arm7_lpc2000)
     ARCH_SRC +=                                  \
     arch/common/core/interrupts_arm7.cpp         \
     ##arch/common/drivers/serial_lpc2000.cpp
+
+    ## Select programmer command line
+    ## This is the program that is invoked when the user types 'make program'
+    ## The command must provide a way to program the board, or print an error
+    ## message saying that 'make program' is not supported for that board.
+    PROGRAM_CMDLINE := lpc21isp -verify main.hex /dev/ttyUSB0 115200 14746
+
+else ifeq ($(ARCH),arm7_gba)
+    ## Base directory with header files for this board
+    ARCH_INC := arch/arm7_gba/common
+
+    ##-------------------------------------------------------------------------
+    ## BOARD: gba
+    ##
+    ifeq ($(OPT_BOARD),gba)
+
+        ## Base directory with header files for this board
+        BOARD_INC := arch/arm7_gba/gba
+
+        ## Select linker script and boot file
+        ## Their path must be relative to the miosix directory.
+        BOOT_FILE := $(BOARD_INC)/core/stage_1_boot.o
+        LINKER_SCRIPT := arch/arm7_gba/gba/miosix.ld
+
+        ## Select architecture specific files
+        ## These are the files in arch/<arch name>/<board name>
+        ARCH_SRC :=                                  \
+        $(BOARD_INC)/interfaces-impl/portability.cpp \
+        $(BOARD_INC)/interfaces-impl/os_timer.cpp    \
+        $(BOARD_INC)/interfaces-impl/bsp.cpp
+
+        ## Add a #define to allow querying board name
+        CFLAGS_BASE   += -D_BOARD_MIOSIX_BOARD
+        CXXFLAGS_BASE += -D_BOARD_MIOSIX_BOARD
+    
+    ##-------------------------------------------------------------------------
+    ## End of board list
+    ##
+    endif
+
+    ## Select compiler
+    PREFIX=arm-miosix-eabi-
+
+    ## From compiler prefix form the name of the compiler and other tools
+    CC  := $(PREFIX)gcc
+    CXX := $(PREFIX)g++
+    LD  := $(PREFIX)ld
+    AR  := $(PREFIX)ar
+    AS  := $(PREFIX)as
+    CP  := $(PREFIX)objcopy
+    OD  := $(PREFIX)objdump
+    SZ  := $(PREFIX)size
+
+    ## Select appropriate compiler flags for both ASM/C/C++/linker
+    AFLAGS_BASE   := -mcpu=arm7tdmi -mapcs-32 -mfloat-abi=soft
+    CFLAGS_BASE   += -mcpu=arm7tdmi $(OPT_OPTIMIZATION) -c
+    CXXFLAGS_BASE += -mcpu=arm7tdmi $(OPT_OPTIMIZATION) \
+                     $(OPT_EXCEPT) -c
+    LFLAGS_BASE   := -mcpu=arm7tdmi -Wl,--gc-sections,-Map,main.map          \
+                     -Wl,-T$(KPATH)/$(LINKER_SCRIPT) $(OPT_EXCEPT)           \
+                      $(OPT_OPTIMIZATION) -nostdlib
+
+    ## Select architecture specific files
+    ## These are the files in arch/<arch name>/common
+    ARCH_SRC +=                                  \
+    arch/common/core/interrupts_arm7.cpp         \
 
     ## Select programmer command line
     ## This is the program that is invoked when the user types 'make program'
