@@ -1,6 +1,0 @@
-
-#ifndef ARCH_REGISTERS_IMPL_H
-#define	ARCH_REGISTERS_IMPL_H
-
-
-#endif	//ARCH_REGISTERS_IMPL_H
