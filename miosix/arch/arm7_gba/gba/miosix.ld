@@ -89,7 +89,7 @@ _heap_end      = _stack_start;
 /* identify the Entry Point  */
 ENTRY(_startup)
 
-/* specify the LPC2138 memory areas  */
+/* specify the gba memory areas  */
 MEMORY
 {
     ROM     : ORIGIN = 0x08000000, LENGTH = 32M

@@ -849,7 +849,7 @@ ifeq ($(ARCH),arm7_lpc2000)
     ## These are the files in arch/<arch name>/common
     ARCH_SRC +=                                  \
     arch/common/core/interrupts_arm7.cpp         \
-    ##arch/common/drivers/serial_lpc2000.cpp
+    arch/common/drivers/serial_lpc2000.cpp
 
     ## Select programmer command line
     ## This is the program that is invoked when the user types 'make program'
@@ -905,8 +905,8 @@ else ifeq ($(ARCH),arm7_gba)
 
     ## Select appropriate compiler flags for both ASM/C/C++/linker
     AFLAGS_BASE   := -mcpu=arm7tdmi -mapcs-32 -mfloat-abi=soft
-    CFLAGS_BASE   += -mcpu=arm7tdmi $(OPT_OPTIMIZATION) -c
-    CXXFLAGS_BASE += -mcpu=arm7tdmi $(OPT_OPTIMIZATION) \
+    CFLAGS_BASE   += -D_ARCH_ARM7_LPC2000 -mcpu=arm7tdmi $(OPT_OPTIMIZATION) -c
+    CXXFLAGS_BASE += -D_ARCH_ARM7_LPC2000 -mcpu=arm7tdmi $(OPT_OPTIMIZATION) \
                      $(OPT_EXCEPT) -c
     LFLAGS_BASE   := -mcpu=arm7tdmi -Wl,--gc-sections,-Map,main.map          \
                      -Wl,-T$(KPATH)/$(LINKER_SCRIPT) $(OPT_EXCEPT)           \

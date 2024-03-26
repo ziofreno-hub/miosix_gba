@@ -8,4 +8,5 @@ using namespace miosix;
 int main()
 {
     //iprintf("Hello world, write your application here\n");
+    LCD_REGISTERS->DISPCNT;
 }
