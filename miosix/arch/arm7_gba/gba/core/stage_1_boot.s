@@ -29,7 +29,7 @@ _startup:
         .CODE 32
     @ Start Vector
 
-        b       _vectors
+    b       _vectors
 
     @ Nintendo Logo Character Data (8000004h)
 @        .fill   156,1,0
@@ -145,7 +145,7 @@ Reset_Handler:
     if main returns, it will jump to the reset vector, rebooting the system.
     Using bx instead of b to support thumb mode */
     ldr     r12, =_init
-    ldr	    lr, =0xc0
+    ldr	    lr, =0xfc
     bx      r12
 
 .endfunc

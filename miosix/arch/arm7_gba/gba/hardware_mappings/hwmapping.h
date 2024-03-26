@@ -20,6 +20,10 @@
 #define SERIAL_2 ((struct serial_2 *) 0x4000134)
 #define INTERRUPT_REGISTERS ((struct interrupt_registers *) 0x4000200)
 
+/* The screen is simply a pointer into memory at a specific address this
+ * pointer points to 16-bit colors of which there are 240x160 */
+#define LCD_DISPLAY ((volatile uint16_t *) 0x6000000)
+
 #define GPIO_BASE 0x80000C4)
 
 #endif

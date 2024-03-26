@@ -905,6 +905,8 @@ else ifeq ($(ARCH),arm7_gba)
 
     ## Select appropriate compiler flags for both ASM/C/C++/linker
     AFLAGS_BASE   := -mcpu=arm7tdmi -mapcs-32 -mfloat-abi=soft
+    ## Debug symbols, remove at last
+    AFLAGS_BASE   += -g
     CFLAGS_BASE   += -D_ARCH_ARM7_LPC2000 -mcpu=arm7tdmi $(OPT_OPTIMIZATION) -c
     CXXFLAGS_BASE += -D_ARCH_ARM7_LPC2000 -mcpu=arm7tdmi $(OPT_OPTIMIZATION) \
                      $(OPT_EXCEPT) -c
